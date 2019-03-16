@@ -36,24 +36,25 @@ Please cite our paper if you find the code or dataset useful for your research.
 ### Install
 - Clone this repo:
 ```
-git clone https://github.com/hytseng0509/DRIT_HR.git
-cd DRIT_HR/src
+git https://github.com/hytseng0509/DRIT_hr.git
+cd DRIT_hr
 ```
 
 ## Datasets
-- We calidate our model on street scene datasets: [GTA](https://download.visinf.tu-darmstadt.de/data/from_games/) and [Cityscapes](https://www.cityscapes-dataset.com/)
+- We validate our model on street scene datasets: [GTA](https://download.visinf.tu-darmstadt.de/data/from_games/) and [Cityscapes](https://www.cityscapes-dataset.com/)
 ```
 cd datasets/gta2cityscapes
+mkdir trainA trainB
 ```
-- Images from two domains should be places in folders "trainA" and "trainB" separately
+- Download images from two domains and place in folders `trainA` and `trainB` separately
 
 ## Usage
 - Training
 ```
 python3 train.py --dataroot ../datasets/gta2cityscapes -name NAME --display_dir DISPLAY_DIR --result_dir RESULT_DIR
-tensorboard --logdir DISPLAY_DIR/yosemite
+tensorboard --logdir DISPLAY_DIR/NAME
 ```
-Results and saved models can be found at `RESULT_DIR/yosemite`.
+Results and saved models can be found at `RESULT_DIR/NAME`.
 
 - Generate results with randomly sampled attributes
   - Require folder `testA` (for a2b) or `testB` (for b2a) under dataroot
@@ -63,12 +64,12 @@ python3 test.py --dataroot ../datasets/gta2cityscapes -name NAME --output_dir OU
 - Generate results with attributes encoded from given images
   - Require both folders `testA` and `testB` under dataroot
 ```
-python3 test.py --dataroot ../datasets/gta2cityscapes -name NAME --output_dir OUTPUT_DIR --resume MODEL_FILE --num NUM_PER_IMG
+python3 test_transfer.py --dataroot ../datasets/gta2cityscapes -name NAME --output_dir OUTPUT_DIR --resume MODEL_FILE
 ```
 - Results can be found at `OUTPUT_DIR/NAME`
 
 ## Note
 - The feature-wise transformation (i.e. `--concat 0`) is not fully tested yet
-- We also implement [Mode Seeking](https://github.com/HelenMao/MSGAN) loss, specify `--ms` to apply it in the training
-- Due to large number of training images in the GTA dataset, the default training epoch is set to 90. Please refer to the default setting in original [DRIT](https://github.com/HsinYingLee/DRIT) if the number of training image is around 1K.
-- Feel free to contact the authors for any potential improvement of the code.
+- We also adopt [Mode Seeking](https://github.com/HelenMao/MSGAN) loss, specify `--ms` to apply mode seeking loss in the training
+- Due to the large number of training images in the GTA dataset, the default training epoch is set to 90. Please refer to the default setting in original [DRIT](https://github.com/HsinYingLee/DRIT) if the number of training images is around 1K.
+- Feel free to contact the authors for any potential improvement of the code
