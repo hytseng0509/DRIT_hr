@@ -141,9 +141,9 @@ class DRIT(nn.Module):
     self.z_random2 = self.get_z_random(self.real_A_encoded.size(0), self.nz, 'guass')
 
     # first cross translation
-    input_content_forA = torch.cat((self.z_content_b, self.z_content_a, self.z_content_b, self.z_content_b),0)
-    input_content_forB = torch.cat((self.z_content_a, self.z_content_b, self.z_content_a, self.z_content_a),0)
     if self.ms:
+      input_content_forA = torch.cat((self.z_content_b, self.z_content_a, self.z_content_b, self.z_content_b),0)
+      input_content_forB = torch.cat((self.z_content_a, self.z_content_b, self.z_content_a, self.z_content_a),0)
       input_attr_forA = torch.cat((self.z_attr_a, self.z_attr_a, self.z_random, self.z_random2),0)
       input_attr_forB = torch.cat((self.z_attr_b, self.z_attr_b, self.z_random, self.z_random2),0)
       output_fakeA, output_fakeA_s = self.gen.forward_a(input_content_forA, input_attr_forA)
@@ -153,6 +153,8 @@ class DRIT(nn.Module):
       self.fake_A_encoded_s, self.fake_AA_encoded_s, self.fake_A_random_s, _ = torch.split(output_fakeA_s, self.z_content_a.size(0), dim=0)
       self.fake_B_encoded_s, self.fake_BB_encoded_s, self.fake_B_random_s, _ = torch.split(output_fakeB_s, self.z_content_a.size(0), dim=0)
     else:
+      input_content_forA = torch.cat((self.z_content_b, self.z_content_a, self.z_content_b),0)
+      input_content_forB = torch.cat((self.z_content_a, self.z_content_b, self.z_content_a),0)
       input_attr_forA = torch.cat((self.z_attr_a, self.z_attr_a, self.z_random),0)
       input_attr_forB = torch.cat((self.z_attr_b, self.z_attr_b, self.z_random),0)
       output_fakeA, output_fakeA_s = self.gen.forward_a(input_content_forA, input_attr_forA)
@@ -251,8 +253,8 @@ class DRIT(nn.Module):
     pred_fake = netD.forward(fake.detach(), fake_s.detach())
     pred_real = netD.forward(real)
     for it, (out_a, out_b) in enumerate(zip(pred_fake, pred_real)):
-      out_fake = nn.functional.sigmoid(out_a)
-      out_real = nn.functional.sigmoid(out_b)
+      out_fake = torch.sigmoid(out_a)
+      out_real = torch.sigmoid(out_b)
       all0 = torch.zeros_like(out_fake).cuda(self.gpu)
       all1 = torch.ones_like(out_real).cuda(self.gpu)
       ad_fake_loss = nn.functional.binary_cross_entropy(out_fake, all0)
@@ -265,8 +267,8 @@ class DRIT(nn.Module):
     pred_fake = self.disContent.forward(imageA.detach())
     pred_real = self.disContent.forward(imageB.detach())
     for it, (out_a, out_b) in enumerate(zip(pred_fake, pred_real)):
-      out_fake = nn.functional.sigmoid(out_a)
-      out_real = nn.functional.sigmoid(out_b)
+      out_fake = torch.sigmoid(out_a)
+      out_real = torch.sigmoid(out_b)
       all1 = torch.ones((out_real.size(0))).cuda(self.gpu)
       all0 = torch.zeros((out_fake.size(0))).cuda(self.gpu)
       ad_true_loss = nn.functional.binary_cross_entropy(out_real, all1)
@@ -347,7 +349,7 @@ class DRIT(nn.Module):
   def backward_G_GAN_content(self, data):
     outs = self.disContent.forward(data)
     for out in outs:
-      outputs_fake = nn.functional.sigmoid(out)
+      outputs_fake = torch.sigmoid(out)
       all_half = 0.5*torch.ones((outputs_fake.size(0))).cuda(self.gpu)
       ad_loss = nn.functional.binary_cross_entropy(outputs_fake, all_half)
     return ad_loss
@@ -356,7 +358,7 @@ class DRIT(nn.Module):
     outs_fake = netD.forward(fake, fake_s)
     loss_G = 0
     for out_a in outs_fake:
-      outputs_fake = nn.functional.sigmoid(out_a)
+      outputs_fake = torch.sigmoid(out_a)
       all_ones = torch.ones_like(outputs_fake).cuda(self.gpu)
       loss_G += nn.functional.binary_cross_entropy(outputs_fake, all_ones)
     return loss_G
