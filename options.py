@@ -63,7 +63,7 @@ class TestOptions():
     self.parser.add_argument('--result_dir', type=str, default='../outputs', help='path for saving result images and models')
 
     # model related
-    self.parser.add_argument('--dis_scale', type=int, default=3, help='scale of discriminator')
+    #self.parser.add_argument('--dis_scale', type=int, default=3, help='scale of discriminator')
     self.parser.add_argument('--concat', type=int, default=1, help='concatenate attribute features for translation, set 0 for using feature-wise transform')
     self.parser.add_argument('--resume', type=str, required=True, help='specified the dir of saved models for resume the training')
     self.parser.add_argument('--gpu', type=int, default=0, help='gpu')
@@ -77,5 +77,5 @@ class TestOptions():
     # set irrelevant options
     self.opt.dis_norm = 'None'
     self.opt.dis_spectral_norm = False
-    self.ms = False
+    self.opt.ms = False
     return self.opt
